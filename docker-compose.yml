@@ -1,0 +1,46 @@
+# Local stack with real AI calls OFF: no provider keys, and the service uses the `mock` alias.
+# For the one real pre-release check see docker-compose.real.yml.
+# Dev-only defaults below; never reuse them outside a laptop.
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: litellm
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev-only-password}
+      POSTGRES_DB: litellm
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U litellm"]
+      interval: 5s
+      retries: 10
+
+  gateway:
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    command: ["--config", "/app/config.yaml", "--port", "4000"]
+    environment:
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-dev-only-master}
+      DATABASE_URL: postgresql://litellm:${POSTGRES_PASSWORD:-dev-only-password}@db:5432/litellm
+      # No provider keys here on purpose: compose reads .env, so passing them would put real keys in the
+      # container. They are added only by docker-compose.real.yml (make up-real).
+    ports: ["4000:4000"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://localhost:4000/health/liveliness', timeout=3)"]
+      interval: 5s
+      retries: 30
+    depends_on:
+      db: {condition: service_healthy}
+
+  support-triage:
+    build:
+      context: .
+      dockerfile: services/support-triage/Dockerfile
+    environment:
+      GATEWAY_URL: http://gateway:4000
+      GATEWAY_KEY: ${LITELLM_MASTER_KEY:-sk-dev-only-master}  # in real use, the per-tool key from registry.issue_keys
+      MODEL_ALIAS: mock
+      SHADOW_MODE: "1"
+      WEBHOOK_SECRET: ${WEBHOOK_SECRET:-dev-only-webhook-secret}  # demo value; set a real one with: openssl rand -hex 32
+    ports: ["8000:8000"]
+    depends_on:
+      gateway: {condition: service_healthy}

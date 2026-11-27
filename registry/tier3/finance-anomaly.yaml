@@ -1,0 +1,9 @@
+name: finance-anomaly
+owner: finance-tools@example.com
+description: Flags unusual invoice lines for an analyst to review. Reads invoice data, writes nothing back.
+data: financial
+human_check: sampled
+tier: 3
+runbook: registry/runbooks/finance-anomaly.md
+allowed_models: [analysis-default]
+budget_usd_month: 100

@@ -1,0 +1,9 @@
+name: competitor-digest
+owner: marketing-tools@example.com
+description: Turns crawled public competitor page text into a short digest line and a notable flag for a marketing channel.
+data: public
+human_check: sampled
+tier: 1
+runbook: registry/runbooks/competitor-digest.md
+allowed_models: [drafts-default, drafts-fallback]
+budget_usd_month: 20

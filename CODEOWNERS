@@ -1,0 +1,6 @@
+# Higher tiers need more reviewers. Handles are placeholders for your own teams.
+/registry/tier1/   @example-org/platform
+/registry/tier2/   @example-org/platform @example-org/data-governance
+/registry/tier3/   @example-org/platform @example-org/security @example-org/data-governance
+/gateway/          @example-org/platform @example-org/security
+/evals/baselines/  @example-org/platform

@@ -1,0 +1,10 @@
+# Turns real AI calls ON. Use only for the single pre-release check: make up-real smoke-real CONFIRM_REAL_AI=yes
+# Keys are read from .env (gitignored); the stack refuses to start without them.
+services:
+  gateway:
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:?set it in .env}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:?set it in .env}
+  support-triage:
+    environment:
+      MODEL_ALIAS: triage-default

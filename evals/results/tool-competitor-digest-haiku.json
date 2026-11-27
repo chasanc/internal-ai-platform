@@ -1,0 +1,24 @@
+{
+ "tool": "competitor-digest",
+ "n": 16,
+ "valid": 1.0,
+ "fields": {
+  "change": {
+   "acc": 1.0,
+   "ci95": [
+    0.8063865817272802,
+    1.0
+   ]
+  },
+  "notable": {
+   "acc": 1.0,
+   "ci95": [
+    0.8063865817272802,
+    1.0
+   ]
+  }
+ },
+ "model": "anthropic/claude-haiku-5-5",
+ "cost_usd": 0.00125,
+ "misses": []
+}

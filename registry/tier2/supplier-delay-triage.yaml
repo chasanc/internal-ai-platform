@@ -1,0 +1,9 @@
+name: supplier-delay-triage
+owner: supply-tools@example.com
+description: Classifies supplier delay notices by cause and severity and drafts an acknowledgement for the planner to edit.
+data: internal
+human_check: required
+tier: 2
+runbook: registry/runbooks/supplier-delay-triage.md
+allowed_models: [triage-default, triage-fallback]
+budget_usd_month: 20

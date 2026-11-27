@@ -1,0 +1,11 @@
+# Local interview/planning context — never push to public GitHub
+reference/
+HANDOFF.md
+
+# Python / OS / IDE
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.DS_Store
+.claude/

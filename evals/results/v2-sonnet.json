@@ -1,0 +1,438 @@
+{
+ "model": "anthropic/claude-sonnet-5-5",
+ "dataset": "support-triage.golden.jsonl",
+ "prompt": "triage.v2.md",
+ "metrics": {
+  "n": 50,
+  "schema_compliance": {
+   "value": 0.98,
+   "ci95": [
+    0.895,
+    0.996
+   ],
+   "k": 49,
+   "n": 50
+  },
+  "category_accuracy": {
+   "value": 0.98,
+   "ci95": [
+    0.895,
+    0.996
+   ],
+   "k": 49,
+   "n": 50
+  },
+  "priority_accuracy": {
+   "value": 0.84,
+   "ci95": [
+    0.715,
+    0.917
+   ],
+   "k": 42,
+   "n": 50
+  },
+  "needs_human_accuracy": {
+   "value": 0.9,
+   "ci95": [
+    0.786,
+    0.957
+   ],
+   "k": 45,
+   "n": 50
+  },
+  "category_macro_f1": 0.987,
+  "per_class": {
+   "billing": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "support": 10
+   },
+   "shipping": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "support": 8
+   },
+   "returns": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "support": 6
+   },
+   "technical": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "support": 8
+   },
+   "account": {
+    "precision": 1.0,
+    "recall": 0.857,
+    "f1": 0.923,
+    "support": 7
+   },
+   "other": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "support": 11
+   }
+  },
+  "latency_p50_s": 2.074,
+  "latency_p95_s": 5.543,
+  "cost_per_ticket_usd": 0.002686,
+  "per_ticket": [
+   {
+    "id": "t001",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t002",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t003",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t004",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t005",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t006",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t007",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t008",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": false
+   },
+   {
+    "id": "t009",
+    "valid": false,
+    "category_ok": false,
+    "priority_ok": false,
+    "needs_human_ok": false
+   },
+   {
+    "id": "t010",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t011",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": false
+   },
+   {
+    "id": "t012",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": false,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t013",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t014",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": false
+   },
+   {
+    "id": "t015",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": false,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t016",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t017",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t018",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t019",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t020",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t021",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": false,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t022",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t023",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t024",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": false
+   },
+   {
+    "id": "t025",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t026",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t027",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t028",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t029",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t030",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t031",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t032",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t033",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t034",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t035",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": false,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t036",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t037",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t038",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": false,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t039",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": false,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t040",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": false,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t041",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t042",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t043",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t044",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t045",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t046",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t047",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t048",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t049",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "t050",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   }
+  ]
+ }
+}

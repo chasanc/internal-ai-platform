@@ -1,0 +1,9 @@
+name: pr-risk-summary
+owner: engineering-tools@example.com
+description: Rates a pull request description for risk and flags it for security review. A reviewer decides; nothing is blocked or merged.
+data: internal
+human_check: required
+tier: 2
+runbook: registry/runbooks/pr-risk-summary.md
+allowed_models: [triage-default, triage-fallback]
+budget_usd_month: 20

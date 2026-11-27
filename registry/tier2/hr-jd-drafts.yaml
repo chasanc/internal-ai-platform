@@ -1,0 +1,9 @@
+name: hr-jd-drafts
+owner: people-tools@example.com
+description: Drafts job descriptions from a hiring manager's bullet points. A recruiter edits and publishes.
+data: internal
+human_check: required
+tier: 2
+runbook: registry/runbooks/hr-jd-drafts.md
+allowed_models: [drafts-default, drafts-fallback]
+budget_usd_month: 20

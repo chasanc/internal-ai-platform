@@ -1,0 +1,228 @@
+{
+ "model": "anthropic/claude-haiku-5-5",
+ "dataset": "support-triage.heldout.jsonl",
+ "prompt": "triage.v2.md",
+ "metrics": {
+  "n": 20,
+  "schema_compliance": {
+   "value": 1.0,
+   "ci95": [
+    0.839,
+    1.0
+   ],
+   "k": 20,
+   "n": 20
+  },
+  "category_accuracy": {
+   "value": 0.95,
+   "ci95": [
+    0.764,
+    0.991
+   ],
+   "k": 19,
+   "n": 20
+  },
+  "priority_accuracy": {
+   "value": 0.9,
+   "ci95": [
+    0.699,
+    0.972
+   ],
+   "k": 18,
+   "n": 20
+  },
+  "needs_human_accuracy": {
+   "value": 1.0,
+   "ci95": [
+    0.839,
+    1.0
+   ],
+   "k": 20,
+   "n": 20
+  },
+  "category_macro_f1": 0.958,
+  "per_class": {
+   "billing": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "support": 4
+   },
+   "shipping": {
+    "precision": 0.75,
+    "recall": 1.0,
+    "f1": 0.857,
+    "support": 3
+   },
+   "returns": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "support": 2
+   },
+   "technical": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "support": 3
+   },
+   "account": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "support": 3
+   },
+   "other": {
+    "precision": 1.0,
+    "recall": 0.8,
+    "f1": 0.889,
+    "support": 5
+   }
+  },
+  "latency_p50_s": 1.163,
+  "latency_p95_s": 1.726,
+  "cost_per_ticket_usd": 0.000132,
+  "per_ticket": [
+   {
+    "id": "h001",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "h002",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "h003",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": false,
+    "needs_human_ok": true
+   },
+   {
+    "id": "h004",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "h005",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "h006",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "h007",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "h008",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "h009",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "h010",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "h011",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "h012",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "h013",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "h014",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "h015",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "h016",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "h017",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "h018",
+    "valid": true,
+    "category_ok": false,
+    "priority_ok": false,
+    "needs_human_ok": true
+   },
+   {
+    "id": "h019",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   },
+   {
+    "id": "h020",
+    "valid": true,
+    "category_ok": true,
+    "priority_ok": true,
+    "needs_human_ok": true
+   }
+  ]
+ }
+}

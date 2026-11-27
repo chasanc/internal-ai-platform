@@ -1,0 +1,29 @@
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test-and-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+      - run: uv sync --locked
+      - run: make test
+      # A PR that changes a prompt or the model code must also commit a fresh candidate
+      # result (from `make eval`), so the gate below judges the real change. No secrets in CI.
+      - name: require candidate result
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          changed=$(git diff --name-only "origin/${BASE_REF}...HEAD")
+          if echo "$changed" | grep -qE '^(services/[^/]+/prompts/|evals/models\.py|evals/schema\.py|evals/datasets/)'; then
+            echo "$changed" | grep -qx 'evals/results/candidate.json' \
+              || { echo "prompt/model/dataset changed: run 'make eval MODEL=...' and commit evals/results/candidate.json"; exit 1; }
+          fi
+      - run: make gate

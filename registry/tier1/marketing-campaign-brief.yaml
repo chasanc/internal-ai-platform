@@ -1,0 +1,9 @@
+name: marketing-campaign-brief
+owner: marketing-tools@example.com
+description: Turns a campaign idea and public product facts into a one-page brief for a marketer to edit.
+data: public
+human_check: required
+tier: 1
+runbook: registry/runbooks/marketing-campaign-brief.md
+allowed_models: [drafts-default, drafts-fallback]
+budget_usd_month: 15

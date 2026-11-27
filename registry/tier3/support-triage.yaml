@@ -1,0 +1,9 @@
+name: support-triage
+owner: support-tools@example.com
+description: Classifies incoming support tickets and drafts a private note for the agent. Never replies to the customer.
+data: personal
+human_check: required
+tier: 3
+runbook: services/support-triage/runbook.md
+allowed_models: [triage-default, triage-fallback]
+budget_usd_month: 50

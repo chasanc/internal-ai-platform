@@ -1,0 +1,1 @@
+{"fields": {"anomaly": ["none", "duplicate", "amount_outlier", "unknown_vendor"], "hold_payment": "bool"}, "text": ["note"]}

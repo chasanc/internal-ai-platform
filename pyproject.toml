@@ -1,0 +1,25 @@
+[project]
+name = "internal-ai-platform"
+version = "0.1.0"
+description = "Reference foundation for internal AI tools: model gateway, PII boundary, git tool registry, and CI eval gates."
+requires-python = ">=3.11"
+dependencies = [
+    "litellm>=1.50",
+    "pydantic>=2.7",
+    "pyyaml>=6",
+    "tenacity>=8",  # litellm needs it for num_retries
+    "fastapi>=0.110",
+    "httpx>=0.27",
+    "uvicorn>=0.29",
+    "jsonschema>=4.26.0",
+]
+
+[project.optional-dependencies]
+postgres = ["psycopg[binary]>=3.1"]  # only for the support-triage customer lookup (CUSTOMER_DB_URL)
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+testpaths = ["evals/tests", "services/support-triage/tests", "gateway/tests", "registry/tests", "templates/python-service/tests", "examples/python", "scripts", "services/tool-runner/tests"]
+pythonpath = [".", "services/support-triage", "services/tool-runner"]
