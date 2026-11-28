@@ -7,8 +7,11 @@ services:
 
   redis:  # shared router state: rate limits and provider cooldowns are then counted across gateways, not per gateway
     image: redis:7-alpine
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:-dev-only-redis}"]
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD-SHELL", "redis-cli -a $$REDIS_PASSWORD ping | grep -q PONG"]
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-dev-only-redis}
       interval: 5s
       retries: 10
 
@@ -29,8 +32,7 @@ services:
     deploy: {replicas: 2}
     environment:
       DISABLE_SCHEMA_UPDATE: "true"
-      REDIS_HOST: redis
-      REDIS_PORT: "6379"
+      REDIS_URL: ${REDIS_URL:-redis://:${REDIS_PASSWORD:-dev-only-redis}@redis:6379}  # set REDIS_URL in .env to use a Redis outside this stack
     depends_on:
       migrate: {condition: service_completed_successfully}
       redis: {condition: service_healthy}
