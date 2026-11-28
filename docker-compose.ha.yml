@@ -1,0 +1,52 @@
+# Several instances behind a load balancer, still with real AI calls OFF (mock alias, no provider keys).
+#   make up-ha smoke-ha        then        make down
+# Two gateways and two triage services share one Postgres and one Redis. Dev-only passwords, as in docker-compose.yml.
+services:
+  db:
+    build: {context: ., dockerfile: deploy/Dockerfile.db}  # adds the `triage` database
+
+  redis:  # shared router state: rate limits and provider cooldowns are then counted across gateways, not per gateway
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 10
+
+  migrate:  # one job applies the gateway schema; the instances below must not each try to
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    command: ["--config", "/app/config.yaml", "--skip_server_startup"]
+    environment:
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-dev-only-master}
+      DATABASE_URL: postgresql://litellm:${POSTGRES_PASSWORD:-dev-only-password}@db:5432/litellm
+    restart: "no"
+    depends_on:
+      db: {condition: service_healthy}
+
+  gateway:
+    ports: !reset []
+    deploy: {replicas: 2}
+    environment:
+      DISABLE_SCHEMA_UPDATE: "true"
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      redis: {condition: service_healthy}
+
+  support-triage:
+    ports: !reset []
+    deploy: {replicas: 2}
+    environment:
+      GATEWAY_URL: http://lb:4000
+      SHADOW_MODE: "0"  # post for real so the smoke test can count posts; the helpdesk is the in-memory fake
+      IDEMPOTENCY_DB_URL: postgresql://litellm:${POSTGRES_PASSWORD:-dev-only-password}@db:5432/triage
+    depends_on:
+      lb: {condition: service_started}
+
+  lb:
+    build: {context: ., dockerfile: deploy/Dockerfile.lb}
+    ports: ["8000:8000", "4000:4000"]
+    depends_on:
+      gateway: {condition: service_healthy}

@@ -1,4 +1,5 @@
 """Service tests. No network and no real model: the model is a stub or the deterministic fake."""
+import asyncio
 import json
 
 import httpx
@@ -6,7 +7,8 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.gateway import Gateway
-from app.handler import Deps, handle
+from app.handler import Deps
+from sync_handle import handle
 from app.helpdesk import InMemoryHelpdesk
 from app.main import create_app
 from evals.models import FakeModel
@@ -93,8 +95,8 @@ def test_gateway_client_speaks_openai_format():
         assert req.url.path == "/v1/chat/completions" and body["model"] == "triage-default"
         return httpx.Response(200, json={"choices": [{"message": {"content": GOOD}}]})
 
-    g = Gateway("http://gw", "triage-default", client=httpx.Client(transport=httpx.MockTransport(respond)))
-    assert g.complete("sys", "user") == GOOD
+    g = Gateway("http://gw", "triage-default", client=httpx.AsyncClient(transport=httpx.MockTransport(respond)))
+    assert asyncio.run(g.complete("sys", "user")) == GOOD
 
 
 def test_http_routes_and_env_kill_switch(monkeypatch):

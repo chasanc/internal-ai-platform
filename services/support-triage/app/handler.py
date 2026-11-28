@@ -1,8 +1,10 @@
 """Triage one ticket. Any failure takes the single fallback path: write nothing, ticket stays in the normal queue."""
+import asyncio
+import inspect
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Callable
+from typing import Awaitable, Callable
 
 from app.customer import CustomerLookup
 from app.helpdesk import Helpdesk
@@ -18,7 +20,7 @@ AGENT_ACTIONS = {"sent", "edited", "discarded"}
 
 @dataclass
 class Deps:
-    complete: Callable[[str, str], str]  # (system, user) -> raw model text
+    complete: Callable[[str, str], Awaitable[str] | str]  # (system, user) -> raw model text; async in production
     helpdesk: Helpdesk
     model: str = "triage-default"  # gateway alias
     kill_switch: bool = False
@@ -27,8 +29,11 @@ class Deps:
     lookup: CustomerLookup | None = None  # optional account context; see app/customer.py
 
 
-def handle(ticket_id: str, text: str, d: Deps, requester_email: str | None = None) -> str:
-    """Returns one of: killed, duplicate, fallback, shadow, posted."""
+async def handle(ticket_id: str, text: str, d: Deps, requester_email: str | None = None) -> str:
+    """Returns one of: killed, duplicate, fallback, shadow, posted.
+
+    The model call is awaited. The store, lookup and helpdesk are blocking adapters, so each runs in a worker thread
+    and never stalls the event loop."""
     t0 = time.perf_counter()
 
     def done(outcome: str, **fields) -> str:
@@ -39,7 +44,7 @@ def handle(ticket_id: str, text: str, d: Deps, requester_email: str | None = Non
     key = f"{ticket_id}:{PROMPT_VERSION}"
     if d.kill_switch:
         return done("killed")
-    if not d.idempotency.claim(key):  # claim before the model call so a retried delivery in flight is a duplicate
+    if not await asyncio.to_thread(d.idempotency.claim, key):  # claim before the model call so a retried delivery in flight is a duplicate
         return done("duplicate")
     posted = False
     try:
@@ -47,7 +52,7 @@ def handle(ticket_id: str, text: str, d: Deps, requester_email: str | None = Non
         account, lookup = None, "off"  # the requester email is used for this lookup only: never logged or sent on
         if d.lookup and requester_email:
             try:
-                account = d.lookup.find(requester_email)
+                account = await asyncio.to_thread(d.lookup.find, requester_email)
                 lookup = "found" if account else "none"
             except Exception:  # lookup down or email not unique: draft from the ticket text alone
                 lookup = "error"
@@ -55,6 +60,8 @@ def handle(ticket_id: str, text: str, d: Deps, requester_email: str | None = Non
         user = user_message(masked, mask(account.render())[0] if account else None)
         try:
             raw = d.complete(PROMPT, user)
+            if inspect.isawaitable(raw):  # Gateway.complete is async; tests may pass a plain function
+                raw = await raw
         except Exception as e:  # timeout or provider error
             return done("fallback", reason=type(e).__name__, **ctx)
         t = parse_triage(raw)
@@ -69,14 +76,14 @@ def handle(ticket_id: str, text: str, d: Deps, requester_email: str | None = Non
             note += ("\n\n[Account data matched from the sender's email address; verify the sender before "
                      f"using it in a reply] {account.render()}")
         try:
-            d.helpdesk.post_private_note(ticket_id, note)
+            await asyncio.to_thread(d.helpdesk.post_private_note, ticket_id, note)
         except Exception as e:
             return done("fallback", reason=f"helpdesk_{type(e).__name__}", **ctx)
         posted = True
         return done("posted", **summary)
     finally:
         if not posted:  # any non-posted outcome (even an unexpected error) frees the claim for a retry
-            d.idempotency.release(key)
+            await asyncio.shield(asyncio.to_thread(d.idempotency.release, key))  # even if the request was cancelled
 
 
 def record_action(ticket_id: str, action: str) -> bool:

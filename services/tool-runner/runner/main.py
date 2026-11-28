@@ -44,14 +44,14 @@ def key_for(tool: str) -> str:
     return os.environ.get("GATEWAY_KEY_" + tool.upper().replace("-", "_")) or os.environ.get("GATEWAY_KEY", "")
 
 
-def create_app(client: httpx.Client | None = None) -> FastAPI:
+def create_app(client: httpx.AsyncClient | None = None) -> FastAPI:
     secret = os.environ.get("RUN_SECRET", "")  # shortcut: shared secret, no replay window and no rate limit
     if not secret and os.environ.get("ALLOW_INSECURE_LOCAL", "").lower() not in {"1", "true", "yes"}:
         raise RuntimeError("RUN_SECRET is not set; set it, or set ALLOW_INSECURE_LOCAL=1 for local development only")
     url = os.environ.get("GATEWAY_URL", "http://gateway:4000").rstrip("/")
     tools = {t.strip() for t in os.environ.get("RUN_TOOLS", "competitor-digest").split(",") if t.strip()}
     loaded = {t: (*load(t)[:2], registry_alias(t)) for t in tools}  # fails at start if a tool or alias is missing
-    http = client or httpx.Client()
+    http = client or httpx.AsyncClient()
     app = FastAPI(title="tool-runner")
 
     @app.get("/healthz")
@@ -59,7 +59,7 @@ def create_app(client: httpx.Client | None = None) -> FastAPI:
         return {"ok": True, "tools": sorted(tools)}
 
     @app.post("/run/{tool}")
-    def run(tool: str, body: Run, x_run_secret: str = Header(default="")):
+    async def run(tool: str, body: Run, x_run_secret: str = Header(default="")):
         if secret and not hmac.compare_digest(x_run_secret, secret):
             raise HTTPException(401, "bad or missing X-Run-Secret")
         if tool not in loaded:
@@ -72,7 +72,7 @@ def create_app(client: httpx.Client | None = None) -> FastAPI:
 
         masked, n = mask(TAGS.sub("", body.text))
         try:
-            r = http.post(f"{url}/v1/chat/completions", timeout=30, json={
+            r = await http.post(f"{url}/v1/chat/completions", timeout=30, json={
                 "model": alias, "temperature": 0, "max_tokens": 400,
                 "messages": [{"role": "system", "content": prompt},
                              {"role": "user", "content": f"<input>{masked}</input>"}]},

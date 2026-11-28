@@ -27,6 +27,8 @@ model_list:
       mock_response: '{"category":"other","priority":"low","needs_human":true,"draft_reply":"Thanks for contacting us."}'
 
 router_settings:
+  redis_host: os.environ/REDIS_HOST  # several gateway instances: shared rate limits and cooldowns. Unset = per instance
+  redis_port: os.environ/REDIS_PORT
   num_retries: 1
   timeout: 30
   fallbacks:

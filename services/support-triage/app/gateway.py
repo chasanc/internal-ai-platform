@@ -1,15 +1,15 @@
-"""Client for the model gateway (an OpenAI-compatible endpoint). Tools use an alias, never a provider model name."""
+"""Async client for the model gateway (an OpenAI-compatible endpoint). Tools use an alias, never a provider model name."""
 import httpx
 
 
 class Gateway:
     def __init__(self, url: str, alias: str, api_key: str = "", timeout_s: float = 30.0,
-                 client: httpx.Client | None = None):
+                 client: httpx.AsyncClient | None = None):
         self.url, self.alias, self.api_key, self.timeout_s = url.rstrip("/"), alias, api_key, timeout_s
-        self.client = client or httpx.Client()
+        self.client = client or httpx.AsyncClient()
 
-    def complete(self, system: str, user: str) -> str:
-        r = self.client.post(
+    async def complete(self, system: str, user: str) -> str:
+        r = await self.client.post(
             f"{self.url}/v1/chat/completions",
             json={"model": self.alias, "temperature": 0, "max_tokens": 400,
                   "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}]},

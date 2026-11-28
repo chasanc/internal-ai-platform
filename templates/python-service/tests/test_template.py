@@ -1,3 +1,4 @@
+import asyncio
 import json
 import sys
 from pathlib import Path
@@ -21,6 +22,6 @@ def test_gateway_sends_alias_and_returns_text():
         seen["body"] = json.loads(request.content)
         return httpx.Response(200, json={"choices": [{"message": {"content": "hi"}}]})
 
-    g = Gateway("http://gw/", "triage-default", client=httpx.Client(transport=httpx.MockTransport(handler)))
-    assert g.complete("sys", "user") == "hi"
+    g = Gateway("http://gw/", "triage-default", client=httpx.AsyncClient(transport=httpx.MockTransport(handler)))
+    assert asyncio.run(g.complete("sys", "user")) == "hi"
     assert seen["body"]["model"] == "triage-default"

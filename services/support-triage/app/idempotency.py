@@ -4,8 +4,9 @@ claim() is atomic: of two concurrent callers with the same key exactly one gets 
 non-posted outcome so a retry can run. Two implementations, both stdlib only:
 - InMemoryIdempotencyStore: one process; forgets everything on restart.
 - SQLiteIdempotencyStore: survives restarts and is shared by workers on one machine (a file on a shared volume).
-shortcut: a claim never expires, so a worker killed between claim and release leaves that ticket blocked until its row
-is deleted; add a timestamp and a TTL for in-flight claims, or use the database, when that matters.
+- PostgresIdempotencyStore: shared by every instance behind a load balancer; abandoned claims expire.
+shortcut: the in-memory and SQLite claims never expire, so a worker killed between claim and release leaves that
+ticket blocked until its row is deleted; behind a load balancer use the Postgres store.
 """
 import sqlite3
 import threading
@@ -32,6 +33,48 @@ class InMemoryIdempotencyStore:
     def release(self, key: str) -> None:
         with self._lock:
             self._seen.discard(key)
+
+
+class PostgresIdempotencyStore:
+    """Shared by every instance behind a load balancer. One short-lived connection per call; `connect` is injectable.
+
+    A claim older than `ttl_s` counts as abandoned (its instance died between claim and release) and is taken over,
+    so a crashed instance cannot block a ticket for ever. Keep ttl_s above the longest possible request.
+    Use a database of its own, not the gateway's: the gateway owns and migrates that one.
+    """
+
+    def __init__(self, dsn: str = "", connect=None, ttl_s: int = 600):
+        if connect is None:
+            import psycopg  # optional dependency: pip install "psycopg[binary]"
+            connect = lambda: psycopg.connect(dsn, connect_timeout=5)  # noqa: E731
+        self.connect, self.ttl_s = connect, ttl_s
+        with self._tx() as cur:
+            cur.execute("SELECT pg_advisory_xact_lock(7301)")  # instances starting together must not race the CREATE
+            cur.execute("CREATE TABLE IF NOT EXISTS claims (key TEXT PRIMARY KEY, claimed_at TIMESTAMPTZ NOT NULL)")
+
+    def _tx(self):
+        from contextlib import contextmanager
+
+        @contextmanager
+        def tx():
+            conn = self.connect()
+            try:
+                with conn:  # commits on success, rolls back on error
+                    yield conn.cursor()
+            finally:
+                conn.close()
+        return tx()
+
+    def claim(self, key: str) -> bool:
+        with self._tx() as cur:  # inserts, or takes over a stale claim; a live claim matches neither, so 0 rows
+            cur.execute("INSERT INTO claims (key, claimed_at) VALUES (%s, now()) ON CONFLICT (key) DO UPDATE "
+                        "SET claimed_at = now() WHERE claims.claimed_at < now() - make_interval(secs => %s)",
+                        (key, self.ttl_s))
+            return cur.rowcount == 1
+
+    def release(self, key: str) -> None:
+        with self._tx() as cur:
+            cur.execute("DELETE FROM claims WHERE key = %s", (key,))
 
 
 class SQLiteIdempotencyStore:

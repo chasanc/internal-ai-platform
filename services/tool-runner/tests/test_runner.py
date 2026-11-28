@@ -24,7 +24,7 @@ def make(monkeypatch, reply=GOOD, status=200, seen=None, **env):
         content = reply if isinstance(reply, str) else json.dumps(reply)
         return httpx.Response(200, json={"choices": [{"message": {"content": content}}]})
 
-    return TestClient(create_app(httpx.Client(transport=httpx.MockTransport(handler))))
+    return TestClient(create_app(httpx.AsyncClient(transport=httpx.MockTransport(handler))))
 
 
 def test_valid_reply_is_returned_and_the_call_is_wrapped_masked_and_keyed(monkeypatch):

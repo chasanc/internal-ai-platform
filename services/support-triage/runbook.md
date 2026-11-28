@@ -41,6 +41,6 @@ JSON lines. `triage` events carry `ticket_id`, `prompt_version`, `model`, `outco
 
 ## Known limits
 
-- Idempotency is in memory by default and resets on restart, so a redelivery after a restart can post a second note. Set `IDEMPOTENCY_DB=/path/claims.db` for the SQLite store (restart-safe, shared by workers on one machine). A claim never expires: if a worker dies mid-call, delete that row. Use the database across machines.
+- Idempotency is in memory by default and resets on restart, so a redelivery after a restart can post a second note. Set `IDEMPOTENCY_DB=/path/claims.db` for the SQLite store (restart-safe, shared by workers on one machine). That claim never expires: if a worker dies mid-call, delete that row. Across machines or behind a load balancer set `IDEMPOTENCY_DB_URL` (Postgres, a database of its own); claims older than 10 minutes are taken over. See [`docs/load-balancing.md`](../../docs/load-balancing.md).
 - The service will not start without `WEBHOOK_SECRET` (set `ALLOW_INSECURE_LOCAL=1` for local development only).
 - The helpdesk adapter is an in-memory fake. Implement `post_private_note` for the real helpdesk.

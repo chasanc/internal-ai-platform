@@ -3,7 +3,8 @@ import threading
 
 import pytest
 
-from app.handler import PROMPT_VERSION, Deps, handle
+from app.handler import PROMPT_VERSION, Deps
+from sync_handle import handle
 from app.helpdesk import InMemoryHelpdesk
 from app.idempotency import InMemoryIdempotencyStore, SQLiteIdempotencyStore
 

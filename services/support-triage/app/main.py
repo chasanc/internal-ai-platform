@@ -9,7 +9,7 @@ from app.gateway import Gateway
 from app.handler import Deps, handle, record_action
 from app.customer import PostgresCustomerLookup
 from app.helpdesk import Helpdesk, InMemoryHelpdesk, RestHelpdesk
-from app.idempotency import InMemoryIdempotencyStore, SQLiteIdempotencyStore
+from app.idempotency import InMemoryIdempotencyStore, PostgresIdempotencyStore, SQLiteIdempotencyStore
 
 
 class Webhook(BaseModel):
@@ -34,6 +34,16 @@ def helpdesk_from_env() -> Helpdesk:
     return RestHelpdesk(os.environ["HELPDESK_URL"], os.environ["HELPDESK_USER"], os.environ["HELPDESK_TOKEN"])
 
 
+def idempotency_from_env():
+    """IDEMPOTENCY_DB_URL (Postgres) is for several instances behind a load balancer; IDEMPOTENCY_DB (a file) for
+    workers on one machine; neither means one process only."""
+    if os.environ.get("IDEMPOTENCY_DB_URL"):
+        return PostgresIdempotencyStore(os.environ["IDEMPOTENCY_DB_URL"])
+    if os.environ.get("IDEMPOTENCY_DB"):
+        return SQLiteIdempotencyStore(os.environ["IDEMPOTENCY_DB"])
+    return InMemoryIdempotencyStore()
+
+
 def create_app(deps: Deps | None = None) -> FastAPI:
     d = deps or Deps(
         complete=Gateway(os.environ.get("GATEWAY_URL", "http://gateway:4000"),
@@ -42,8 +52,7 @@ def create_app(deps: Deps | None = None) -> FastAPI:
         helpdesk=helpdesk_from_env(),
         lookup=PostgresCustomerLookup(os.environ["CUSTOMER_DB_URL"]) if os.environ.get("CUSTOMER_DB_URL") else None,
         model=os.environ.get("MODEL_ALIAS", "triage-default"),
-        idempotency=SQLiteIdempotencyStore(os.environ["IDEMPOTENCY_DB"]) if os.environ.get("IDEMPOTENCY_DB")
-        else InMemoryIdempotencyStore(),  # a file path makes duplicate protection survive restarts and share across workers
+        idempotency=idempotency_from_env(),
     )
     secret = os.environ.get("WEBHOOK_SECRET", "")  # shortcut: shared secret, no body signature or replay window
     if not secret and not flag("ALLOW_INSECURE_LOCAL"):  # fail closed: no secret means no service, not an open one
@@ -60,10 +69,10 @@ def create_app(deps: Deps | None = None) -> FastAPI:
         return {"ok": True}
 
     @app.post("/webhook", dependencies=[Depends(require_secret)])
-    def webhook(w: Webhook):
+    async def webhook(w: Webhook):
         if deps is None:  # env flags are read per request so the kill switch works without a restart
             d.kill_switch, d.shadow = flag("KILL_SWITCH"), flag("SHADOW_MODE")
-        return {"outcome": handle(w.ticket_id, w.text, d, w.requester_email)}
+        return {"outcome": await handle(w.ticket_id, w.text, d, w.requester_email)}
 
     @app.post("/agent-action", dependencies=[Depends(require_secret)])
     def agent_action(a: AgentAction):

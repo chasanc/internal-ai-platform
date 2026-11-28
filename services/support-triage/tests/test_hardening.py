@@ -6,7 +6,8 @@ import time
 import pytest
 from fastapi.testclient import TestClient
 
-from app.handler import PROMPT_VERSION, Deps, handle
+from app.handler import PROMPT_VERSION, Deps
+from sync_handle import handle
 from app.helpdesk import InMemoryHelpdesk
 from app.main import create_app
 from evals.models import PROMPT_PATH

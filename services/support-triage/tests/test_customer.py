@@ -5,7 +5,8 @@ import httpx
 import pytest
 
 from app.customer import QUERY, Account, InMemoryCustomerLookup, PostgresCustomerLookup
-from app.handler import Deps, handle
+from app.handler import Deps
+from sync_handle import handle
 from app.helpdesk import InMemoryHelpdesk, RestHelpdesk
 
 GOOD = json.dumps({"category": "billing", "priority": "high", "needs_human": True, "draft_reply": "Sorry."})

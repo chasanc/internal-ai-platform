@@ -1,0 +1,3 @@
+# Postgres plus a second database for the triage service's claims (the gateway owns and migrates `litellm`).
+FROM postgres:16
+COPY deploy/initdb/triage.sql /docker-entrypoint-initdb.d/triage.sql

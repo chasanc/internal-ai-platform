@@ -1,7 +1,7 @@
 # Build from the repo root: docker build -f services/support-triage/Dockerfile .
 FROM python:3.12-slim
 WORKDIR /srv
-RUN pip install --no-cache-dir fastapi httpx pydantic uvicorn
+RUN pip install --no-cache-dir fastapi httpx pydantic uvicorn "psycopg[binary]"
 COPY services/support-triage/app ./app
 COPY services/support-triage/prompts ./prompts
 # shared strict output contract, also used by the evals
